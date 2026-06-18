@@ -5,23 +5,19 @@ error_reporting(E_ALL);
 require_once 'includes/crud.php';
 $crud = new CRUD();
 
-// Obtener lista de aviones para el select
-$aviones = $crud->readAllAviones();
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $numero_vuelo = $_POST['numero_vuelo'];
-    $avion_id = $_POST['avion_id'];
-    $origen = $_POST['origen'];
-    $destino = $_POST['destino'];
-    $hora_salida = $_POST['fecha_salida'] . ' ' . $_POST['hora_salida'] . ':00';
-    $hora_llegada = $_POST['fecha_llegada'] . ' ' . $_POST['hora_llegada'] . ':00';
+    $matricula = $_POST['matricula'];
+    $modelo = $_POST['modelo'];
+    $fabricante = $_POST['fabricante'];
+    $capacidad = $_POST['capacidad'];
+    $año_fabricacion = $_POST['año_fabricacion'];
     $estado = $_POST['estado'];
     
-    if ($crud->createVuelo($numero_vuelo, $avion_id, $origen, $destino, $hora_salida, $hora_llegada, $estado)) {
-        header('Location: vuelos_list.php?mensaje=Vuelo programado exitosamente');
+    if ($crud->createAvion($matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado)) {
+        header('Location: aviones_list.php?mensaje=Avión registrado exitosamente');
         exit();
     } else {
-        $error = "Error al programar el vuelo. El número de vuelo podría estar duplicado.";
+        $error = "Error al registrar el avión. La matrícula podría estar duplicada.";
     }
 }
 ?>
@@ -30,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📋 Programar Vuelo - Aerolínea Pro</title>
+    <title>➕ Agregar Avión - Aerolínea Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -90,11 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border-color: #1a3a5c;
             outline: none;
         }
-        .fila-horarios {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
         .btn-guardar {
             background: #4caf50;
             color: white;
@@ -133,16 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             display: flex;
             gap: 10px;
         }
-        .info-hint {
-            font-size: 12px;
-            color: #6b7a8f;
-            margin-top: 5px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📋 Programar Nuevo Vuelo</h1>
+        <h1>➕ Agregar Nuevo Avión</h1>
         
         <div class="navbar">
             <a href="index.php">🏠 Inicio</a>
@@ -156,68 +142,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         <form method="POST">
             <div class="form-group">
-                <label>Número de Vuelo *</label>
-                <input type="text" name="numero_vuelo" placeholder="Ej: AA1234" required>
-                <div class="info-hint">Identificador único del vuelo</div>
+                <label>Matrícula *</label>
+                <input type="text" name="matricula" placeholder="Ej: CC-ABC" required>
             </div>
             
             <div class="form-group">
-                <label>Avion Asignado *</label>
-                <select name="avion_id" required>
-                    <option value="">-- Seleccionar Avión --</option>
-                    <?php foreach ($aviones as $avion): ?>
-                        <option value="<?= $avion['id'] ?>">
-                            <?= htmlspecialchars($avion['modelo']) ?> - <?= htmlspecialchars($avion['matricula']) ?> (<?= $avion['capacidad'] ?> pax)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <label>Modelo *</label>
+                <input type="text" name="modelo" placeholder="Ej: Boeing 787 Dreamliner" required>
             </div>
             
             <div class="form-group">
-                <label>Origen *</label>
-                <input type="text" name="origen" placeholder="Ej: Santiago (SCL)" required>
+                <label>Fabricante *</label>
+                <input type="text" name="fabricante" placeholder="Ej: Boeing" required>
             </div>
             
             <div class="form-group">
-                <label>Destino *</label>
-                <input type="text" name="destino" placeholder="Ej: Miami (MIA)" required>
+                <label>Capacidad (pasajeros) *</label>
+                <input type="number" name="capacidad" placeholder="Ej: 290" required min="1">
             </div>
             
-            <div class="fila-horarios">
-                <div class="form-group">
-                    <label>Fecha de Salida *</label>
-                    <input type="date" name="fecha_salida" required>
-                </div>
-                <div class="form-group">
-                    <label>Hora de Salida *</label>
-                    <input type="time" name="hora_salida" required>
-                </div>
-            </div>
-            
-            <div class="fila-horarios">
-                <div class="form-group">
-                    <label>Fecha de Llegada *</label>
-                    <input type="date" name="fecha_llegada" required>
-                </div>
-                <div class="form-group">
-                    <label>Hora de Llegada *</label>
-                    <input type="time" name="hora_llegada" required>
-                </div>
+            <div class="form-group">
+                <label>Año de Fabricación</label>
+                <input type="number" name="año_fabricacion" placeholder="Ej: 2020" min="1900" max="2026">
             </div>
             
             <div class="form-group">
                 <label>Estado</label>
                 <select name="estado">
-                    <option value="Programado">📋 Programado</option>
-                    <option value="En Vuelo">✈️ En Vuelo</option>
-                    <option value="Aterrizado">🛬 Aterrizado</option>
-                    <option value="Cancelado">❌ Cancelado</option>
+                    <option value="Activo">✅ Activo</option>
+                    <option value="Mantenimiento">🔧 Mantenimiento</option>
+                    <option value="Retirado">❌ Retirado</option>
                 </select>
             </div>
             
             <div class="botones">
-                <button type="submit" class="btn-guardar">💾 Guardar Vuelo</button>
-                <a href="vuelos_list.php" class="btn-cancelar">❌ Cancelar</a>
+                <button type="submit" class="btn-guardar">💾 Guardar Avión</button>
+                <a href="aviones_list.php" class="btn-cancelar">❌ Cancelar</a>
             </div>
         </form>
     </div>

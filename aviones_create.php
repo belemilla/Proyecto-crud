@@ -1,22 +1,42 @@
 <?php
+ini_set("display_errors", 1);
+ini_set("display_startup_errors", 1);
+error_reporting(E_ALL);
+// ===== ACTIVAR ERRORES - VA AL INICIO =====
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once 'includes/crud.php';
 $crud = new CRUD();
 
+$mensaje = '';
+$tipo_mensaje = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $matricula = $_POST['matricula'];
-    $modelo = $_POST['modelo'];
-    $fabricante = $_POST['fabricante'];
-    $capacidad = $_POST['capacidad'];
-    $año_fabricacion = $_POST['año_fabricacion'];
+    $matricula = trim($_POST['matricula']);
+    $modelo = trim($_POST['modelo']);
+    $fabricante = trim($_POST['fabricante']);
+    $capacidad = (int)$_POST['capacidad'];
+    $año_fabricacion = !empty($_POST['año_fabricacion']) ? (int)$_POST['año_fabricacion'] : null;
     $estado = $_POST['estado'];
     
-    if ($crud->createAvion($matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado)) {
-        header('Location: aviones_list.php?mensaje=Avión registrado exitosamente');
-        exit();
+    if (empty($matricula) || empty($modelo) || empty($fabricante) || empty($capacidad)) {
+        $mensaje = "❌ Todos los campos obligatorios deben ser llenados";
+        $tipo_mensaje = 'error';
     } else {
-        $error = "Error al registrar el avión. La matrícula podría estar duplicada.";
+        if ($crud->createAvion($matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado)) {
+            $mensaje = "✅ Avión registrado exitosamente";
+            $tipo_mensaje = 'exito';
+        } else {
+            $mensaje = "❌ Error: La matrícula '$matricula' ya existe en la base de datos.";
+            $tipo_mensaje = 'error';
+        }
     }
 }
+
+$aviones_existentes = $crud->readAllAviones();
+$matriculas_existentes = array_column($aviones_existentes, 'matricula');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -109,17 +129,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .btn-cancelar:hover {
             background: #d32f2f;
         }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 10px;
+        .mensaje {
+            padding: 15px;
             border-radius: 5px;
             margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .mensaje-exito {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .mensaje-error {
+            background: #f8d7da;
+            color: #721c24;
             border: 1px solid #f5c6cb;
         }
         .botones {
             display: flex;
             gap: 10px;
+        }
+        .info-hint {
+            font-size: 12px;
+            color: #6b7a8f;
+            margin-top: 5px;
+        }
+        .matriculas-existente {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        .debug-info {
+            background: #e8f0fe;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #1a3a5c;
         }
     </style>
 </head>
@@ -131,36 +179,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a href="index.php">🏠 Inicio</a>
             <a href="aviones_list.php">✈️ Aviones</a>
             <a href="vuelos_list.php">🛫 Vuelos</a>
+            <a href="vuelos_create.php">📋 Programar Vuelo</a>
         </div>
         
-        <?php if (isset($error)): ?>
-            <div class="error">❌ <?= $error ?></div>
+        <?php if ($mensaje): ?>
+            <div class="mensaje mensaje-<?= $tipo_mensaje ?>">
+                <?= $mensaje ?>
+            </div>
         <?php endif; ?>
+        
+        <div class="matriculas-existente">
+            <strong>⚠️ Matrículas ya usadas:</strong> 
+            <?= implode(', ', $matriculas_existentes) ?>
+            <br><small>Usa una matrícula diferente a las anteriores</small>
+        </div>
+        
+        <div class="debug-info">
+            📌 Modo de errores: <strong>ACTIVADO</strong> ✅
+            <br>Si ves este mensaje, PHP está funcionando correctamente.
+        </div>
         
         <form method="POST">
             <div class="form-group">
                 <label>Matrícula *</label>
-                <input type="text" name="matricula" placeholder="Ej: CC-ABC" required>
+                <input type="text" name="matricula" placeholder="Ej: CC-MNO" required>
+                <div class="info-hint">Ejemplos: CC-MNO, CC-PQR, CC-STU, CC-VWX</div>
             </div>
             
             <div class="form-group">
                 <label>Modelo *</label>
-                <input type="text" name="modelo" placeholder="Ej: Boeing 787 Dreamliner" required>
+                <input type="text" name="modelo" placeholder="Ej: Embraer E190" required>
             </div>
             
             <div class="form-group">
                 <label>Fabricante *</label>
-                <input type="text" name="fabricante" placeholder="Ej: Boeing" required>
+                <input type="text" name="fabricante" placeholder="Ej: Embraer" required>
             </div>
             
             <div class="form-group">
                 <label>Capacidad (pasajeros) *</label>
-                <input type="number" name="capacidad" placeholder="Ej: 290" required min="1">
+                <input type="number" name="capacidad" placeholder="Ej: 100" required min="1">
             </div>
             
             <div class="form-group">
                 <label>Año de Fabricación</label>
-                <input type="number" name="año_fabricacion" placeholder="Ej: 2020" min="1900" max="2026">
+                <input type="number" name="año_fabricacion" placeholder="Ej: 2023" min="1900" max="2026">
             </div>
             
             <div class="form-group">

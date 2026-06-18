@@ -1,39 +1,55 @@
+cat > aviones_update.php << 'EOF'
 <?php
-ini_set("display_errors", 1);
-ini_set("display_startup_errors", 1);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 require_once 'includes/crud.php';
 $crud = new CRUD();
 
+// Mostrar depuración
+echo "<!-- DEBUG: Iniciando aviones_update.php -->\n";
+
 // Verificar que se pasó un ID
-if (!isset($_GET['id'])) {
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    echo "<!-- DEBUG: No se recibió ID -->\n";
     header('Location: aviones_list.php?error=No se especificó el avión');
     exit();
 }
 
-$id = $_GET['id'];
+$id = (int)$_GET['id'];
+echo "<!-- DEBUG: ID recibido: $id -->\n";
+
 $avion = $crud->readAvion($id);
 
 // Si no existe el avión
 if (!$avion) {
+    echo "<!-- DEBUG: Avión no encontrado -->\n";
     header('Location: aviones_list.php?error=El avión no existe');
     exit();
 }
 
+echo "<!-- DEBUG: Avión encontrado: " . $avion['matricula'] . " -->\n";
+
 // Procesar el formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $matricula = $_POST['matricula'];
-    $modelo = $_POST['modelo'];
-    $fabricante = $_POST['fabricante'];
-    $capacidad = $_POST['capacidad'];
-    $año_fabricacion = $_POST['año_fabricacion'];
+    echo "<!-- DEBUG: Procesando POST -->\n";
+    $matricula = trim($_POST['matricula']);
+    $modelo = trim($_POST['modelo']);
+    $fabricante = trim($_POST['fabricante']);
+    $capacidad = (int)$_POST['capacidad'];
+    $año_fabricacion = !empty($_POST['año_fabricacion']) ? (int)$_POST['año_fabricacion'] : null;
     $estado = $_POST['estado'];
     
+    echo "<!-- DEBUG: Datos recibidos: $matricula, $modelo, $fabricante, $capacidad, $estado -->\n";
+    
     if ($crud->updateAvion($id, $matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado)) {
+        echo "<!-- DEBUG: Actualización exitosa -->\n";
         header('Location: aviones_list.php?mensaje=Avión actualizado exitosamente');
         exit();
     } else {
-        $error = "Error al actualizar el avión. Verifica los datos.";
+        $error = "❌ Error al actualizar el avión. Verifica los datos.";
+        echo "<!-- DEBUG: Error en actualización -->\n";
     }
 }
 ?>
@@ -146,6 +162,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border-radius: 5px;
             margin-bottom: 20px;
         }
+        .debug-info {
+            background: #e8f0fe;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #1a3a5c;
+            border: 1px solid #1a3a5c;
+        }
     </style>
 </head>
 <body>
@@ -156,6 +181,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a href="index.php">🏠 Inicio</a>
             <a href="aviones_list.php">✈️ Aviones</a>
             <a href="vuelos_list.php">🛫 Vuelos</a>
+        </div>
+        
+        <div class="debug-info">
+            <strong>🔍 DEBUG:</strong> 
+            ID del avión: <strong><?= $id ?></strong> | 
+            Matrícula: <strong><?= htmlspecialchars($avion['matricula']) ?></strong> |
+            Modelo: <strong><?= htmlspecialchars($avion['modelo']) ?></strong>
         </div>
         
         <?php if (isset($error)): ?>
@@ -209,3 +241,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 </body>
 </html>
+EOF

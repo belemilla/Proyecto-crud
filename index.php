@@ -346,18 +346,7 @@
                 </div>
             </div>
             
-            <!-- Pilotos -->
-            <div class="stat-card">
-                <div class="icon">👨‍✈️</div>
-                <h3>Pilotos</h3>
-                <div class="number">25</div>
-                <div class="sub-stats">
-                    <span>✅ Activos: 25</span>
-                    <span>✈️ En vuelo: 3</span>
-                    <span>📋 Disponibles: 22</span>
-                </div>
-            </div>
-        </div>
+           
         
         <!-- ===== PRÓXIMOS VUELOS ===== -->
         <div class="section-title">

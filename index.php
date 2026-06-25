@@ -206,32 +206,6 @@
         .status-ontime { background: #e8f5e9; color: #2e7d32; }
         .status-preparing { background: #e3f2fd; color: #0d47a1; }
         
-        /* ===== PILOTOS EN VUELO ===== */
-        .pilotos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .piloto-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 4px solid #4fc3f7;
-        }
-        
-        .piloto-card .nombre {
-            font-weight: 700;
-            color: #1a3a5c;
-        }
-        
-        .piloto-card .vuelo {
-            font-size: 14px;
-            color: #6b7a8f;
-            margin-top: 5px;
-        }
         
         /* ===== MANTENIMIENTO ===== */
         .mantenimiento-grid {
@@ -432,43 +406,8 @@
             </table>
         </div>
         
-        <!-- ===== PILOTOS EN VUELO ===== -->
-                <div class="vuelo">AA123 · SCL → MIA</div>
-            </div>
-            <div class="piloto-card">
-                <div class="nombre">👩‍✈️ Laura Mendoza</div>
-                <div class="vuelo">AA456 · SCL → BOG</div>
-            </div>
-            <div class="piloto-card">
-                <div class="nombre">👨‍✈️ Jorge Peña</div>
-                <div class="vuelo">AA789 · SCL → MAD</div>
-            </div>
-        </div>
-        
-        <!-- ===== MANTENIMIENTO ===== -->
-                <div class="tarea">Revisión de motores</div>
-                <div class="progress-bar">
-                    <div class="fill fill-70"></div>
-                </div>
-                <span style="font-size:13px;color:#6b7a8f;margin-top:5px;display:block;">70% completado</span>
-            </div>
-            <div class="mantenimiento-card">
-                <div class="avion">✈️ Airbus A321 - AP-087</div>
-                <div class="tarea">Inspección hidráulica</div>
-                <div class="progress-bar">
-                    <div class="fill fill-40"></div>
-                </div>
-                <span style="font-size:13px;color:#6b7a8f;margin-top:5px;display:block;">40% completado</span>
-            </div>
-            <div class="mantenimiento-card">
-                <div class="avion">✈️ Boeing 767 - AP-011</div>
-                <div class="tarea">Chequeo de aviónica</div>
-                <div class="progress-bar">
-                    <div class="fill fill-15"></div>
-                </div>
-                <span style="font-size:13px;color:#6b7a8f;margin-top:5px;display:block;">15% completado</span>
-            </div>
-        </div>
+    
+                          
         
         <!-- ===== INTEGRANTES ===== -->
         <div class="integrantes-section">

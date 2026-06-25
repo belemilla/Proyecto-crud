@@ -335,7 +335,7 @@
         <div class="header">
             <h1>✈️ <span>Aerolínea</span> Pro</h1>
             <div class="user-info">
-                <span>👤 Grupo [Nombre]</span>
+                <span>👤 Belén y Ema </span>
             </div>
         </div>
         
@@ -433,10 +433,6 @@
         </div>
         
         <!-- ===== PILOTOS EN VUELO ===== -->
-        <h2 style="color:#1a3a5c; margin-bottom:15px;">👨‍✈️ Pilotos en vuelo</h2>
-        <div class="pilotos-grid">
-            <div class="piloto-card">
-                <div class="nombre">👨‍✈️ Carlos Ramírez</div>
                 <div class="vuelo">AA123 · SCL → MIA</div>
             </div>
             <div class="piloto-card">
@@ -450,10 +446,6 @@
         </div>
         
         <!-- ===== MANTENIMIENTO ===== -->
-        <h2 style="color:#1a3a5c; margin-bottom:15px;">🔧 Mantenimiento activo</h2>
-        <div class="mantenimiento-grid">
-            <div class="mantenimiento-card">
-                <div class="avion">✈️ Boeing 737 - AP-082</div>
                 <div class="tarea">Revisión de motores</div>
                 <div class="progress-bar">
                     <div class="fill fill-70"></div>
@@ -482,10 +474,9 @@
         <div class="integrantes-section">
             <h2>👥 Integrantes del Grupo</h2>
             <ul>
-                <li><strong>1.</strong> [Nombre Integrante 1] - [Rol]</li>
-                <li><strong>2.</strong> [Nombre Integrante 2] - [Rol]</li>
-                <li><strong>3.</strong> [Nombre Integrante 3] - [Rol]</li>
-                <li><strong>4.</strong> [Nombre Integrante 4] - [Rol]</li>
+                <li><strong>1.</strong> Belén Muñoz </li>
+                <li><strong>2.</strong> Ema Arraño </li>
+                
             </ul>
             <p style="margin-top:15px;color:#6b7a8f;font-size:14px;">
                 <strong>📝 Descripción:</strong> Sistema de Gestión de Flota Aérea que permite administrar aviones, 

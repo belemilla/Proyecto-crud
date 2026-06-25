@@ -10,7 +10,6 @@ $crud = new CRUD();
 $stats = $crud->getEstadisticas();
 $aviones = $crud->readAllAviones();
 $vuelos = $crud->readAllVuelos();
-$pilotos = $crud->readAllPilotos();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -220,49 +219,6 @@ $pilotos = $crud->readAllPilotos();
         .status-ontime { background: #e8f5e9; color: #2e7d32; }
         .status-preparing { background: #e3f2fd; color: #0d47a1; }
         
-        /* ===== MANTENIMIENTO ===== */
-        .mantenimiento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .mantenimiento-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        
-        .mantenimiento-card .avion {
-            font-weight: 700;
-            color: #1a3a5c;
-        }
-        
-        .mantenimiento-card .tarea {
-            font-size: 14px;
-            color: #6b7a8f;
-            margin: 5px 0 10px 0;
-        }
-        
-        .progress-bar {
-            background: #eef2f7;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .progress-bar .fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s;
-        }
-        
-        .fill-70 { width: 70%; background: #ff9800; }
-        .fill-40 { width: 40%; background: #f44336; }
-        .fill-15 { width: 15%; background: #ff9800; }
-        
         /* ===== INTEGRANTES ===== */
         .integrantes-section {
             background: white;
@@ -357,22 +313,12 @@ $pilotos = $crud->readAllPilotos();
                     <span>📅 Programados: <?= $stats['vuelos_programados'] ?? 0 ?></span>
                 </div>
             </div>
-            
-            <!-- Pilotos -->
-            <div class="stat-card">
-                <div class="icon">👨‍✈️</div>
-                <h3>Pilotos</h3>
-                <div class="number"><?= count($pilotos) ?></div>
-                <div class="sub-stats">
-                    <span>✅ Registrados: <?= count($pilotos) ?></span>
-                </div>
-            </div>
         </div>
         
         <!-- ===== PRÓXIMOS VUELOS ===== -->
         <div class="section-title">
             <span>🛫 Próximos vuelos</span>
-            <span class="badge">8 hoy</span>
+            <span class="badge"><?= count($vuelos) ?> vuelos</span>
         </div>
         
         <div class="table-wrapper">
@@ -388,30 +334,34 @@ $pilotos = $crud->readAllPilotos();
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>AA123</strong></td>
-                        <td>SCL</td>
-                        <td>MIA</td>
-                        <td>10:30</td>
-                        <td>Boeing 787</td>
-                        <td><span class="status-badge status-boarding">🔴 Abordando</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>AA456</strong></td>
-                        <td>SCL</td>
-                        <td>BOG</td>
-                        <td>12:15</td>
-                        <td>Airbus A320</td>
-                        <td><span class="status-badge status-ontime">✅ A tiempo</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>AA789</strong></td>
-                        <td>SCL</td>
-                        <td>MAD</td>
-                        <td>15:45</td>
-                        <td>Boeing 777</td>
-                        <td><span class="status-badge status-preparing">🔄 Preparando</span></td>
-                    </tr>
+                    <?php if (count($vuelos) > 0): ?>
+                        <?php foreach ($vuelos as $vuelo): ?>
+                            <tr>
+                                <td><strong><?= htmlspecialchars($vuelo['numero_vuelo']) ?></strong></td>
+                                <td><?= htmlspecialchars($vuelo['origen']) ?></td>
+                                <td><?= htmlspecialchars($vuelo['destino']) ?></td>
+                                <td><?= date('H:i', strtotime($vuelo['hora_salida'])) ?></td>
+                                <td><?= htmlspecialchars($vuelo['avion_modelo'] ?? 'N/A') ?></td>
+                                <td>
+                                    <?php
+                                    $estado = $vuelo['estado'];
+                                    $clase = 'status-ontime';
+                                    if ($estado == 'Programado') $clase = 'status-preparing';
+                                    if ($estado == 'En Vuelo') $clase = 'status-boarding';
+                                    if ($estado == 'Aterrizado') $clase = 'status-ontime';
+                                    if ($estado == 'Cancelado') $clase = 'status-preparing';
+                                    ?>
+                                    <span class="status-badge <?= $clase ?>"><?= $estado ?></span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align:center;padding:30px;color:#6b7a8f;">
+                                🚫 No hay vuelos programados
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

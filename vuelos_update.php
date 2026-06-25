@@ -1,8 +1,5 @@
+cat > vuelos_update.php << 'EOF'
 <?php
-ini_set("display_errors", 1);
-ini_set("display_startup_errors", 1);
-error_reporting(E_ALL);
-// Activar errores para depuración
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -38,33 +35,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hora_llegada = $_POST['fecha_llegada'] . ' ' . $_POST['hora_llegada'] . ':00';
     $estado = $_POST['estado'];
     
-    if ($crud->updateVuelo($id, $numero_vuelo, $avion_id, $origen, $destino, $hora_salida, $hora_llegada, $estado)) {
-        header('Location: vuelos_list.php?mensaje=Vuelo actualizado exitosamente');
-        exit();
+    if (empty($numero_vuelo) || empty($origen) || empty($destino)) {
+        $error = "❌ Todos los campos obligatorios deben ser llenados";
     } else {
-        $error = "Error al actualizar el vuelo. Verifica los datos.";
+        if ($crud->updateVuelo($id, $numero_vuelo, $avion_id, $origen, $destino, $hora_salida, $hora_llegada, $estado)) {
+            header('Location: vuelos_list.php?mensaje=Vuelo actualizado exitosamente');
+            exit();
+        } else {
+            $error = "❌ Error al actualizar el vuelo. Verifica los datos.";
+        }
     }
 }
 
 // Extraer fecha y hora para los campos
-try {
-    $fecha_salida = date('Y-m-d', strtotime($vuelo['hora_salida']));
-    $hora_salida = date('H:i', strtotime($vuelo['hora_salida']));
-    $fecha_llegada = date('Y-m-d', strtotime($vuelo['hora_llegada']));
-    $hora_llegada = date('H:i', strtotime($vuelo['hora_llegada']));
-} catch (Exception $e) {
-    $fecha_salida = date('Y-m-d');
-    $hora_salida = '00:00';
-    $fecha_llegada = date('Y-m-d');
-    $hora_llegada = '00:00';
-}
+$fecha_salida = date('Y-m-d', strtotime($vuelo['hora_salida']));
+$hora_salida = date('H:i', strtotime($vuelo['hora_salida']));
+$fecha_llegada = date('Y-m-d', strtotime($vuelo['hora_llegada']));
+$hora_llegada = date('H:i', strtotime($vuelo['hora_llegada']));
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✏️ Editar Vuelo - Aerolínea Pro</title>
+    <title>✏️ Editar Vuelo - BE Airlines</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -173,14 +167,6 @@ try {
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        .avion-seleccionado {
-            background: #e8f5e9;
-            padding: 8px;
-            border-radius: 5px;
-            margin-top: 5px;
-            font-size: 13px;
-            color: #2e7d32;
-        }
     </style>
 </head>
 <body>
@@ -194,7 +180,7 @@ try {
         </div>
         
         <?php if (isset($error)): ?>
-            <div class="error">❌ <?= htmlspecialchars($error) ?></div>
+            <div class="error">❌ <?= $error ?></div>
         <?php endif; ?>
         
         <div class="info-vuelo">
@@ -212,14 +198,11 @@ try {
                 <select name="avion_id" required>
                     <option value="">-- Seleccionar Avión --</option>
                     <?php foreach ($aviones as $avion): ?>
-                        <option value="<?= $avion['id'] ?>" <?= ($avion['id'] == $vuelo['avion_id']) ? 'selected' : '' ?>>
+                        <option value="<?= $avion['id'] ?>" <?= $avion['id'] == $vuelo['avion_id'] ? 'selected' : '' ?>>
                             <?= htmlspecialchars($avion['modelo']) ?> - <?= htmlspecialchars($avion['matricula']) ?> (<?= $avion['capacidad'] ?> pax)
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="avion-seleccionado">
-                    ✅ Avión actual: <?= htmlspecialchars($vuelo['avion_modelo'] ?? 'No asignado') ?> - <?= htmlspecialchars($vuelo['avion_matricula'] ?? '') ?>
-                </div>
             </div>
             
             <div class="form-group">
@@ -272,3 +255,4 @@ try {
     </div>
 </body>
 </html>
+EOF

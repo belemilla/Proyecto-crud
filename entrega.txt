@@ -1,0 +1,43 @@
+cat > entrega.txt << 'EOF'
+ENTREGA PROYECTO CRUD - GRUPO BE
+
+INTEGRANTES:
+1. Belén Muñoz
+2. Ema Arraño
+
+REPOSITORIO GITHUB:
+https://github.com/belemilla/Proyecto-crud
+
+DEPLOY GITHUB CODESPACES:
+https://didactic-zebra-p5vr4qgp6g4frrxp-8080.app.github.dev/
+
+FECHA ENTREGA: 25-06-2026
+
+DESCRIPCIÓN:
+Sistema de Gestión de Flota Aérea - Aerolínea Pro
+Aplicación web con operaciones CRUD para aviones y vuelos.
+
+TECNOLOGÍAS:
+- PHP 8.4
+- SQLite 3.45
+- HTML5 + CSS3
+- GitHub Codespaces
+
+FUNCIONALIDADES:
+✅ CRUD completo para Aviones (Crear, Leer, Actualizar, Eliminar)
+✅ CRUD completo para Vuelos (Crear, Leer, Actualizar, Eliminar)
+✅ Menú de navegación
+✅ Base de datos operativa (database.db)
+✅ Mockup de la interfaz
+✅ Diseño responsive
+
+OPERACIONES CRUD:
+CREATE  → Agregar aviones y programar vuelos
+READ    → Listar aviones y vuelos
+UPDATE  → Editar aviones y vuelos
+DELETE  → Eliminar aviones y cancelar vuelos
+
+ESTRUCTURA DE BASE DE DATOS:
+- Tabla: aviones (id, matricula, modelo, fabricante, capacidad, año_fabricacion, estado, fecha_registro)
+- Tabla: vuelos (id, numero_vuelo, avion_id, origen, destino, hora_salida, hora_llegada, estado)
+EOF

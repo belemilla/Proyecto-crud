@@ -1,30 +1,130 @@
+cat > vuelos_delete.php << 'EOF'
 <?php
-ini_set("display_errors", 1);
-ini_set("display_startup_errors", 1);
+// ===== ACTIVAR ERRORES =====
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// ===== DESACTIVAR CACHÉ =====
+header('Cache-Control: no-cache, must-revalidate');
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+
 require_once 'includes/crud.php';
 
-// Verificar que se pasó un ID
-if (!isset($_GET['id'])) {
-    header('Location: vuelos_list.php?error=No se especificó el vuelo');
+// ===== VERIFICAR ID =====
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="refresh" content="2; url=vuelos_list.php?error=No se especificó el vuelo">
+        <title>Error - Aerolínea Pro</title>
+        <style>
+            body { font-family: Arial; padding: 50px; text-align: center; background: #f0f4f8; }
+            .mensaje { background: #fee2e2; color: #991b1b; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+        <div class="mensaje">
+            <h2>❌ No se especificó el vuelo</h2>
+            <p>Redirigiendo a la lista de vuelos...</p>
+        </div>
+    </body>
+    </html>
+    <?php
     exit();
 }
 
-$id = $_GET['id'];
+$id = (int)$_GET['id'];
 $crud = new CRUD();
 
-// Verificar que el vuelo existe
+// ===== VERIFICAR QUE EXISTE =====
 $vuelo = $crud->readVuelo($id);
 if (!$vuelo) {
-    header('Location: vuelos_list.php?error=El vuelo no existe');
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="refresh" content="2; url=vuelos_list.php?error=El vuelo no existe">
+        <title>Error - Aerolínea Pro</title>
+        <style>
+            body { font-family: Arial; padding: 50px; text-align: center; background: #f0f4f8; }
+            .mensaje { background: #fee2e2; color: #991b1b; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+        <div class="mensaje">
+            <h2>❌ El vuelo no existe</h2>
+            <p>Redirigiendo a la lista de vuelos...</p>
+        </div>
+    </body>
+    </html>
+    <?php
     exit();
 }
 
-// Eliminar el vuelo
-if ($crud->deleteVuelo($id)) {
-    header('Location: vuelos_list.php?mensaje=Vuelo cancelado exitosamente');
+// ===== INTENTAR ELIMINAR =====
+$resultado = $crud->deleteVuelo($id);
+
+// ===== MOSTRAR RESULTADO =====
+if ($resultado) {
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="refresh" content="1; url=vuelos_list.php?mensaje=Vuelo cancelado exitosamente">
+        <title>Cancelando - Aerolínea Pro</title>
+        <style>
+            body { font-family: Arial; padding: 50px; text-align: center; background: #f0f4f8; }
+            .mensaje { background: #d1fae5; color: #065f46; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; }
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #10b981;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 20px auto;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="mensaje">
+            <h2>✅ Vuelo cancelado exitosamente</h2>
+            <div class="spinner"></div>
+            <p>Redirigiendo a la lista de vuelos...</p>
+            <p><a href="vuelos_list.php" style="color:#065f46;">Haz clic aquí si no eres redirigido</a></p>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit();
 } else {
-    header('Location: vuelos_list.php?error=Error al cancelar el vuelo');
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="refresh" content="2; url=vuelos_list.php?error=Error al cancelar el vuelo">
+        <title>Error - Aerolínea Pro</title>
+        <style>
+            body { font-family: Arial; padding: 50px; text-align: center; background: #f0f4f8; }
+            .mensaje { background: #fee2e2; color: #991b1b; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+        <div class="mensaje">
+            <h2>❌ Error al cancelar el vuelo</h2>
+            <p>Redirigiendo a la lista de vuelos...</p>
+            <p><a href="vuelos_list.php" style="color:#991b1b;">Haz clic aquí si no eres redirigido</a></p>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit();
 }
-exit();
 ?>
+EOF

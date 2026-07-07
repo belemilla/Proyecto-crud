@@ -1,10 +1,10 @@
-cat > index.php << 'EOF'
 <?php
 // ===== CONECTAR A LA BASE DE DATOS =====
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+require_once 'includes/config.php';  // ← AGREGADO PARA LOGIN
 require_once 'includes/crud.php';
 $crud = new CRUD();
 $stats = $crud->getEstadisticas();
@@ -62,6 +62,21 @@ $vuelos = $crud->readAllVuelos();
             background: rgba(255,255,255,0.1);
             padding: 10px 20px;
             border-radius: 8px;
+        }
+        
+        .header .user-info a {
+            color: white;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        
+        .header .user-info a:hover {
+            text-decoration: underline;
+        }
+        
+        .header .user-info .logout-link {
+            color: #ff6b6b;
+            margin-left: 10px;
         }
         
         /* ===== MENÚ DE NAVEGACIÓN ===== */
@@ -274,11 +289,22 @@ $vuelos = $crud->readAllVuelos();
 <body>
     <div class="container">
         
-        <!-- ===== HEADER ===== -->
+        <!-- ===== HEADER CON LOGIN/LOGOUT ===== -->
         <div class="header">
             <h1>✈️ <span>Aerolínea</span> Pro</h1>
             <div class="user-info">
-                <span>👤 Belén y Ema</span>
+                <?php if (usuario_logueado()): ?>
+                    👤 <?= htmlspecialchars($_SESSION['usuario_nombre'] ?? 'Usuario') ?>
+                    <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] == 'admin'): ?>
+                        <span style="color:#4fc3f7;font-size:12px;">(Admin)</span>
+                    <?php endif; ?>
+                    <a href="bitacora.php" style="color:#4fc3f7;">📋 Bitácora</a>
+                    <a href="logout.php" class="logout-link">🚪 Cerrar sesión</a>
+                <?php else: ?>
+                    <a href="login.php">🔐 Iniciar sesión</a>
+                    |
+                    <a href="register.php">📝 Registrarse</a>
+                <?php endif; ?>
             </div>
         </div>
         
@@ -382,4 +408,3 @@ $vuelos = $crud->readAllVuelos();
     </div>
 </body>
 </html>
-EOF

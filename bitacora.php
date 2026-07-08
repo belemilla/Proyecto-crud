@@ -11,6 +11,7 @@ redirigir_si_no_logueado();
 $usuario = get_usuario_actual();
 $es_admin = $usuario && $usuario['rol'] == 'admin';
 
+// Consultar bitácora
 if ($es_admin) {
     $sql = "SELECT * FROM bitacora ORDER BY id DESC LIMIT 100";
     $stmt = $db->query($sql);
@@ -21,6 +22,7 @@ if ($es_admin) {
 }
 $registros = $stmt->fetchAll();
 
+// Consultar historial
 if ($es_admin) {
     $sql_historial = "SELECT * FROM historial_sesiones ORDER BY id DESC LIMIT 100";
     $stmt_historial = $db->query($sql_historial);
@@ -203,7 +205,6 @@ $historial = $stmt_historial->fetchAll();
                                 <td><?= htmlspecialchars($row['ip']) ?></td>
                                 <td class="fecha-correcta">
                                     <?php 
-                                    // Convertir la fecha a hora de Chile
                                     $fecha = new DateTime($row['fecha'], new DateTimeZone('UTC'));
                                     $fecha->setTimezone(new DateTimeZone('America/Santiago'));
                                     echo $fecha->format('Y-m-d H:i:s');

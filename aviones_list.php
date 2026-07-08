@@ -1,12 +1,11 @@
+cat > aviones_list.php << 'EOF'
 <?php
 require_once 'includes/config.php';
 redirigir_si_no_logueado();
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
-ini_set("display_startup_errors", 1);
-error_reporting(E_ALL);
+
 require_once 'includes/crud.php';
 
 // ===== REGISTRAR EN BITÁCORA - CONSULTAR =====
@@ -14,7 +13,19 @@ registrar_bitacora($_SESSION['usuario_id'] ?? 0, $_SESSION['usuario_email'] ?? '
     "Consultar registros en tabla aviones");
 
 $crud = new CRUD();
-$aviones = $crud->readAllAviones();
+
+// ===== MOSTRAR SOLO LOS AVIONES DEL USUARIO LOGUEADO =====
+$usuario_id = $_SESSION['usuario_id'];
+$sql = "SELECT * FROM aviones WHERE usuario_id = ? OR usuario_id IS NULL ORDER BY id DESC";
+$stmt = $db->prepare($sql);
+$stmt->execute([$usuario_id]);
+$aviones = $stmt->fetchAll();
+
+// También obtener las matrículas existentes para el mensaje de advertencia
+$sql_existentes = "SELECT matricula FROM aviones WHERE usuario_id = ? OR usuario_id IS NULL";
+$stmt_existentes = $db->prepare($sql_existentes);
+$stmt_existentes->execute([$usuario_id]);
+$matriculas_existentes = $stmt_existentes->fetchAll(PDO::FETCH_COLUMN);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -147,6 +158,14 @@ $aviones = $crud->readAllAviones();
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        .aviso {
+            background: #e8f0fe;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #1a3a5c;
+        }
     </style>
 </head>
 <body>
@@ -161,7 +180,10 @@ $aviones = $crud->readAllAviones();
             <a href="vuelos_create.php">📋 Programar Vuelo</a>
         </div>
         
-        <!-- Mostrar mensajes -->
+        <div class="aviso">
+            👤 Mostrando aviones de: <strong><?= htmlspecialchars($_SESSION['usuario_email']) ?></strong>
+        </div>
+        
         <?php if (isset($_GET['mensaje'])): ?>
             <div class="mensaje mensaje-exito">
                 ✅ <?= htmlspecialchars($_GET['mensaje']) ?>
@@ -225,3 +247,4 @@ $aviones = $crud->readAllAviones();
     </div>
 </body>
 </html>
+EOF

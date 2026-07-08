@@ -1,12 +1,9 @@
+cat > aviones_create.php << 'EOF'
 <?php
 require_once 'includes/config.php';
 redirigir_si_no_logueado();
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
-error_reporting(E_ALL);
-// ===== ACTIVAR ERRORES - VA AL INICIO =====
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once 'includes/crud.php';
@@ -22,17 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $capacidad = (int)$_POST['capacidad'];
     $año_fabricacion = !empty($_POST['año_fabricacion']) ? (int)$_POST['año_fabricacion'] : null;
     $estado = $_POST['estado'];
+    $usuario_id = $_SESSION['usuario_id']; // <-- AGREGADO
     
     if (empty($matricula) || empty($modelo) || empty($fabricante) || empty($capacidad)) {
         $mensaje = "❌ Todos los campos obligatorios deben ser llenados";
         $tipo_mensaje = 'error';
     } else {
-        if ($crud->createAvion($matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado)) {
-            // ===== REGISTRAR EN BITÁCORA =====
+        // Modificar la llamada para incluir usuario_id
+        $sql = "INSERT INTO aviones (matricula, modelo, fabricante, capacidad, año_fabricacion, estado, usuario_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $db->prepare($sql);
+        $resultado = $stmt->execute([$matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado, $usuario_id]);
+        
+        if ($resultado) {
             $id_nuevo = $db->lastInsertId();
             registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], 
                 "Crear registro en tabla aviones - ID: $id_nuevo, Matrícula: $matricula, Modelo: $modelo");
-            
             $mensaje = "✅ Avión registrado exitosamente";
             $tipo_mensaje = 'exito';
         } else {
@@ -250,3 +252,4 @@ $matriculas_existentes = array_column($aviones_existentes, 'matricula');
     </div>
 </body>
 </html>
+EOF

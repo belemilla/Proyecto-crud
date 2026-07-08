@@ -1,3 +1,4 @@
+cat > includes/crud.php << 'EOF'
 <?php
 require_once __DIR__ . '/db.php';
 
@@ -10,23 +11,35 @@ class CRUD {
     
     // ==================== OPERACIONES PARA AVIONES ====================
     
-    // CREATE - Agregar avión
-    public function createAvion($matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado = 'Activo') {
+    // CREATE - Agregar avión (con usuario_id)
+    public function createAvion($matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado = 'Activo', $usuario_id = null) {
         try {
-            $sql = "INSERT INTO aviones (matricula, modelo, fabricante, capacidad, año_fabricacion, estado) 
-                    VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO aviones (matricula, modelo, fabricante, capacidad, año_fabricacion, estado, usuario_id) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->db->prepare($sql);
-            return $stmt->execute([$matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado]);
+            return $stmt->execute([$matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado, $usuario_id]);
         } catch (PDOException $e) {
             return false;
         }
     }
     
-    // READ - Listar todos los aviones
+    // READ - Listar todos los aviones (todos los usuarios)
     public function readAllAviones() {
         try {
             $sql = "SELECT * FROM aviones ORDER BY id DESC";
             $stmt = $this->db->query($sql);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+    
+    // READ - Listar aviones por usuario
+    public function readAvionesByUser($usuario_id) {
+        try {
+            $sql = "SELECT * FROM aviones WHERE usuario_id = ? OR usuario_id IS NULL ORDER BY id DESC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$usuario_id]);
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             return [];
@@ -229,3 +242,4 @@ class CRUD {
     }
 }
 ?>
+EOF

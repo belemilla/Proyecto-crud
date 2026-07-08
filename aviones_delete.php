@@ -44,6 +44,10 @@ $crud = new CRUD();
 
 // ===== VERIFICAR QUE EXISTE =====
 $avion = $crud->readAvion($id);
+if ($avion $avion = $crud->readAvion($id);$avion = $crud->readAvion($id); $avion['usuario_id'] != $_SESSION['usuario_id']) {
+    header('Location: aviones_list.php?error=No tienes permiso para eliminar este avión');
+    exit();
+}
 if (!$avion) {
     ?>
     <!DOCTYPE html>

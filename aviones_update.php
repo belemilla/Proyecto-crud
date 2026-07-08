@@ -39,6 +39,10 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id = (int)$_GET['id'];
 $avion = $crud->readAvion($id);
+if ($avion $avion = $crud->readAvion($id);$avion = $crud->readAvion($id); $avion['usuario_id'] != $_SESSION['usuario_id']) {
+    header('Location: aviones_list.php?error=No tienes permiso para editar este avión');
+    exit();
+}
 
 // ===== VERIFICAR QUE EXISTE =====
 if (!$avion) {

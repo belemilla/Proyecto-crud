@@ -4,12 +4,51 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'includes/config.php';  // ← AGREGADO PARA LOGIN
+require_once 'includes/config.php';
+redirigir_si_no_logueado();
 require_once 'includes/crud.php';
+
 $crud = new CRUD();
-$stats = $crud->getEstadisticas();
-$aviones = $crud->readAllAviones();
-$vuelos = $crud->readAllVuelos();
+$usuario_id = $_SESSION['usuario_id'];
+
+// ===== CONTAR AVIONES DEL USUARIO =====
+$stmt_aviones = $db->prepare("SELECT COUNT(*) as total FROM aviones WHERE usuario_id = ? OR usuario_id IS NULL");
+$stmt_aviones->execute([$usuario_id]);
+$total_aviones = $stmt_aviones->fetch()['total'];
+
+$stmt_activos = $db->prepare("SELECT COUNT(*) as total FROM aviones WHERE (usuario_id = ? OR usuario_id IS NULL) AND estado = 'Activo'");
+$stmt_activos->execute([$usuario_id]);
+$aviones_activos = $stmt_activos->fetch()['total'];
+
+$stmt_mantenimiento = $db->prepare("SELECT COUNT(*) as total FROM aviones WHERE (usuario_id = ? OR usuario_id IS NULL) AND estado = 'Mantenimiento'");
+$stmt_mantenimiento->execute([$usuario_id]);
+$aviones_mantenimiento = $stmt_mantenimiento->fetch()['total'];
+
+// ===== CONTAR VUELOS DEL USUARIO =====
+$stmt_vuelos = $db->prepare("SELECT COUNT(*) as total FROM vuelos v 
+                             LEFT JOIN aviones a ON v.avion_id = a.id 
+                             WHERE a.usuario_id = ? OR a.usuario_id IS NULL");
+$stmt_vuelos->execute([$usuario_id]);
+$total_vuelos = $stmt_vuelos->fetch()['total'];
+
+$stmt_programados = $db->prepare("SELECT COUNT(*) as total FROM vuelos v 
+                                  LEFT JOIN aviones a ON v.avion_id = a.id 
+                                  WHERE (a.usuario_id = ? OR a.usuario_id IS NULL) AND v.estado = 'Programado'");
+$stmt_programados->execute([$usuario_id]);
+$vuelos_programados = $stmt_programados->fetch()['total'];
+
+// ===== LISTAR VUELOS DEL USUARIO =====
+$stmt_vuelos_list = $db->prepare("SELECT v.*, a.modelo as avion_modelo, a.matricula as avion_matricula 
+                                   FROM vuelos v 
+                                   LEFT JOIN aviones a ON v.avion_id = a.id 
+                                   WHERE a.usuario_id = ? OR a.usuario_id IS NULL 
+                                   ORDER BY v.hora_salida ASC");
+$stmt_vuelos_list->execute([$usuario_id]);
+$vuelos = $stmt_vuelos_list->fetchAll();
+
+// ===== CONTAR PILOTOS =====
+$stmt_pilotos = $db->query("SELECT COUNT(*) as total FROM pilotos");
+$total_pilotos = $stmt_pilotos->fetch()['total'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -234,6 +273,16 @@ $vuelos = $crud->readAllVuelos();
         .status-ontime { background: #e8f5e9; color: #2e7d32; }
         .status-preparing { background: #e3f2fd; color: #0d47a1; }
         
+        /* ===== AVISO USUARIO ===== */
+        .aviso-usuario {
+            background: #e8f0fe;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #1a3a5c;
+        }
+        
         /* ===== INTEGRANTES ===== */
         .integrantes-section {
             background: white;
@@ -317,16 +366,21 @@ $vuelos = $crud->readAllVuelos();
             <a href="vuelos_create.php">📋 Programar</a>
         </div>
         
-        <!-- ===== ESTADÍSTICAS REALES ===== -->
+        <!-- ===== AVISO DE USUARIO ===== -->
+        <div class="aviso-usuario">
+            👤 Mostrando datos de: <strong><?= htmlspecialchars($_SESSION['usuario_email']) ?></strong>
+        </div>
+        
+        <!-- ===== ESTADÍSTICAS DEL USUARIO ===== -->
         <div class="stats-grid">
             <!-- Aviones -->
             <div class="stat-card">
                 <div class="icon">✈️</div>
                 <h3>Aviones</h3>
-                <div class="number"><?= count($aviones) ?></div>
+                <div class="number"><?= $total_aviones ?></div>
                 <div class="sub-stats">
-                    <span><span class="dot dot-green"></span> Activos: <?= $stats['aviones_activos'] ?? 0 ?></span>
-                    <span><span class="dot dot-orange"></span> Mantenimiento: <?= $stats['aviones_mantenimiento'] ?? 0 ?></span>
+                    <span><span class="dot dot-green"></span> Activos: <?= $aviones_activos ?></span>
+                    <span><span class="dot dot-orange"></span> Mantenimiento: <?= $aviones_mantenimiento ?></span>
                 </div>
             </div>
             
@@ -334,9 +388,9 @@ $vuelos = $crud->readAllVuelos();
             <div class="stat-card">
                 <div class="icon">🛫</div>
                 <h3>Vuelos</h3>
-                <div class="number"><?= count($vuelos) ?></div>
+                <div class="number"><?= $total_vuelos ?></div>
                 <div class="sub-stats">
-                    <span>📅 Programados: <?= $stats['vuelos_programados'] ?? 0 ?></span>
+                    <span>📅 Programados: <?= $vuelos_programados ?></span>
                 </div>
             </div>
         </div>

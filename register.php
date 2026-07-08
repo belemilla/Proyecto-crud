@@ -33,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt = $db->prepare("INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)");
                 if ($stmt->execute([$nombre, $email, $password_hash])) {
                     $usuario_id = $db->lastInsertId();
+                    registrar_bitacora($usuario_id, $email, "Creación de usuario - Nombre: $nombre, Email: $email");
+                    $usuario_id = $db->lastInsertId();
                     registrar_bitacora($usuario_id, $email, "Registro de usuario");
                     registrar_historial($usuario_id, $email, "Usuario registrado");
                     $exito = "✅ Usuario registrado exitosamente. <a href='login.php'>Iniciar sesión</a>";

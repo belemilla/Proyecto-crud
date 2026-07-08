@@ -42,6 +42,8 @@ $crud = new CRUD();
 
 // ===== VERIFICAR QUE EXISTE =====
 $avion = $crud->readAvion($id);
+n// ===== REGISTRAR EN BITÁCORA - ELIMINAR =====
+registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], "Eliminar registro en tabla aviones - ID: $id, Matrícula: " . $avion['matricula']);
 if (!$avion) {
     ?>
     <!DOCTYPE html>

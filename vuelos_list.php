@@ -1,5 +1,7 @@
 <?php
 require_once 'includes/config.php';
+// ===== REGISTRAR EN BITÁCORA - CONSULTAR =====
+registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], "Consultar registros en tabla vuelos");
 redirigir_si_no_logueado();
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);

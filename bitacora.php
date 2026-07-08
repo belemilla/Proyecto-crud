@@ -1,6 +1,10 @@
+cat > bitacora.php << 'EOF'
 <?php
 require_once 'includes/db.php';
 require_once 'includes/config.php';
+
+// ===== ZONA HORARIA =====
+date_default_timezone_set('America/Santiago');
 
 redirigir_si_no_logueado();
 
@@ -135,6 +139,18 @@ $historial = $stmt_historial->fetchAll();
             font-weight: 500;
         }
         .btn:hover { background: #0f2a44; }
+        .fecha-correcta {
+            color: #065f46;
+            font-weight: 500;
+        }
+        .zona-horaria-info {
+            background: #e8f0fe;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #1a3a5c;
+        }
     </style>
 </head>
 <body>
@@ -156,6 +172,10 @@ $historial = $stmt_historial->fetchAll();
         
         <h1 style="color:#1a3a5c;margin-bottom:20px;">📋 Bitácora de Eventos</h1>
         
+        <div class="zona-horaria-info">
+            🕐 Hora local: <strong><?= date('Y-m-d H:i:s') ?></strong> (Zona horaria: Chile)
+        </div>
+        
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>📊 Total registros</h3>
@@ -171,7 +191,7 @@ $historial = $stmt_historial->fetchAll();
             <h3>📝 Bitácora de acciones</h3>
             <table>
                 <thead>
-                    <tr><th>ID</th><th>Usuario</th><th>Acción</th><th>IP</th><th>Fecha</th></tr>
+                    <tr><th>ID</th><th>Usuario</th><th>Acción</th><th>IP</th><th>Fecha (Chile)</th></tr>
                 </thead>
                 <tbody>
                     <?php if (count($registros) > 0): ?>
@@ -181,7 +201,14 @@ $historial = $stmt_historial->fetchAll();
                                 <td><?= htmlspecialchars($row['usuario_email']) ?></td>
                                 <td><?= htmlspecialchars($row['accion']) ?></td>
                                 <td><?= htmlspecialchars($row['ip']) ?></td>
-                                <td><?= $row['fecha'] ?></td>
+                                <td class="fecha-correcta">
+                                    <?php 
+                                    // Convertir la fecha a hora de Chile
+                                    $fecha = new DateTime($row['fecha'], new DateTimeZone('UTC'));
+                                    $fecha->setTimezone(new DateTimeZone('America/Santiago'));
+                                    echo $fecha->format('Y-m-d H:i:s');
+                                    ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -195,7 +222,7 @@ $historial = $stmt_historial->fetchAll();
             <h3>📜 Historial de sesiones</h3>
             <table>
                 <thead>
-                    <tr><th>ID</th><th>Usuario</th><th>Evento</th><th>IP</th><th>Navegador</th><th>Fecha</th></tr>
+                    <tr><th>ID</th><th>Usuario</th><th>Evento</th><th>IP</th><th>Navegador</th><th>Fecha (Chile)</th></tr>
                 </thead>
                 <tbody>
                     <?php if (count($historial) > 0): ?>
@@ -206,7 +233,13 @@ $historial = $stmt_historial->fetchAll();
                                 <td><?= htmlspecialchars($row['evento']) ?></td>
                                 <td><?= htmlspecialchars($row['ip']) ?></td>
                                 <td><?= htmlspecialchars(substr($row['user_agent'] ?? 'Desconocido', 0, 40)) ?>...</td>
-                                <td><?= $row['fecha'] ?></td>
+                                <td class="fecha-correcta">
+                                    <?php 
+                                    $fecha = new DateTime($row['fecha'], new DateTimeZone('UTC'));
+                                    $fecha->setTimezone(new DateTimeZone('America/Santiago'));
+                                    echo $fecha->format('Y-m-d H:i:s');
+                                    ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -220,3 +253,4 @@ $historial = $stmt_historial->fetchAll();
     </div>
 </body>
 </html>
+EOF

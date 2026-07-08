@@ -20,6 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $estado = $_POST['estado'];
     
     if ($crud->createVuelo($numero_vuelo, $avion_id, $origen, $destino, $hora_salida, $hora_llegada, $estado)) {
+        // ===== REGISTRAR EN BITÁCORA - CREAR =====
+        $id_nuevo = $db->lastInsertId();
+        registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], 
+            "Crear registro en tabla vuelos - ID: $id_nuevo, Vuelo: $numero_vuelo, Origen: $origen, Destino: $destino");
+        
         header('Location: vuelos_list.php?mensaje=Vuelo programado exitosamente');
         exit();
     } else {

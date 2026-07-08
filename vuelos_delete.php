@@ -1,7 +1,7 @@
-cat > vuelos_delete.php << 'EOF'
+<?php
 require_once 'includes/config.php';
 redirigir_si_no_logueado();
-<?php
+
 // ===== ACTIVAR ERRORES =====
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -64,6 +64,10 @@ if (!$vuelo) {
     <?php
     exit();
 }
+
+// ===== REGISTRAR EN BITÁCORA - ELIMINAR =====
+registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], 
+    "Eliminar registro en tabla vuelos - ID: $id, Vuelo: " . $vuelo['numero_vuelo']);
 
 // ===== INTENTAR ELIMINAR =====
 $resultado = $crud->deleteVuelo($id);

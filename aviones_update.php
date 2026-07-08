@@ -1,7 +1,6 @@
-cat > aviones_update.php << 'EOF'
+<?php
 require_once 'includes/config.php';
 redirigir_si_no_logueado();
-<?php
 // ===== ACTIVAR ERRORES =====
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -80,6 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $resultado = $crud->updateAvion($id, $matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado);
         
         if ($resultado) {
+            // ===== REGISTRAR EN BITÁCORA - MODIFICAR =====
+            registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], 
+                "Modificar registro en tabla aviones - ID: $id, Matrícula: $matricula, Modelo: $modelo");
             ?>
             <!DOCTYPE html>
             <html>

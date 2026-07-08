@@ -28,6 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $tipo_mensaje = 'error';
     } else {
         if ($crud->createAvion($matricula, $modelo, $fabricante, $capacidad, $año_fabricacion, $estado)) {
+            // ===== REGISTRAR EN BITÁCORA =====
+            $id_nuevo = $db->lastInsertId();
+            registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], 
+                "Crear registro en tabla aviones - ID: $id_nuevo, Matrícula: $matricula, Modelo: $modelo");
+            
             $mensaje = "✅ Avión registrado exitosamente";
             $tipo_mensaje = 'exito';
         } else {

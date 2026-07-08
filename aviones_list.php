@@ -8,6 +8,11 @@ ini_set("display_errors", 1);
 ini_set("display_startup_errors", 1);
 error_reporting(E_ALL);
 require_once 'includes/crud.php';
+
+// ===== REGISTRAR EN BITÁCORA - CONSULTAR =====
+registrar_bitacora($_SESSION['usuario_id'] ?? 0, $_SESSION['usuario_email'] ?? 'sistema', 
+    "Consultar registros en tabla aviones");
+
 $crud = new CRUD();
 $aviones = $crud->readAllAviones();
 ?>

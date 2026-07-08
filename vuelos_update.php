@@ -1,7 +1,6 @@
-cat > vuelos_update.php << 'EOF'
+<?php
 require_once 'includes/config.php';
 redirigir_si_no_logueado();
-<?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -41,6 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "❌ Todos los campos obligatorios deben ser llenados";
     } else {
         if ($crud->updateVuelo($id, $numero_vuelo, $avion_id, $origen, $destino, $hora_salida, $hora_llegada, $estado)) {
+            // ===== REGISTRAR EN BITÁCORA - MODIFICAR =====
+            registrar_bitacora($_SESSION['usuario_id'], $_SESSION['usuario_email'], 
+                "Modificar registro en tabla vuelos - ID: $id, Vuelo: $numero_vuelo, Origen: $origen, Destino: $destino");
+            
             header('Location: vuelos_list.php?mensaje=Vuelo actualizado exitosamente');
             exit();
         } else {

@@ -1,4 +1,8 @@
+cat > includes/config.php << 'EOF'
 <?php
+// ===== ZONA HORARIA =====
+date_default_timezone_set('America/Santiago');
+
 // ===== CONFIGURACIÓN DEL SISTEMA =====
 
 // Activar errores en desarrollo
@@ -15,9 +19,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// ===== CONEXIÓN A LA BASE DE DATOS =====
+require_once __DIR__ . '/db.php';
+$db = Database::getInstance()->getConnection();
+
 // ===== VALIDACIONES DE SEGURIDAD =====
 
-// 1. Validar contraseña: mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número
 function validar_password($password) {
     if (strlen($password) < 8) {
         return ["valido" => false, "mensaje" => "La contraseña debe tener al menos 8 caracteres"];
@@ -37,12 +44,10 @@ function validar_password($password) {
     return ["valido" => true, "mensaje" => "Contraseña válida"];
 }
 
-// 2. Validar email
 function validar_email($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-// 3. Limpiar entrada de usuario
 function limpiar_input($input) {
     return htmlspecialchars(strip_tags(trim($input)));
 }
@@ -105,3 +110,4 @@ function redirigir_si_logueado() {
     }
 }
 ?>
+EOF
